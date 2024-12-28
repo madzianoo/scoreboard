@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tablica wyników</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ececec;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+    
+        .scoreboard {
+            width: 90%;
+            max-width: 800px;
+            background: linear-gradient(to bottom, #001c58, #003882);
+            color: white;
+            text-align: center;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            margin-top: 20px;
+            position: relative;
+        }
+    
+        .teams-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    
+        .team {
+            display: flex;
+            align-items: center;
+        }
+    
+        #team-a-logo {
+            height: 100px;
+            width: 70px;
+            background-color: transparent;
+            margin-left: 60px;
+        }
+
+        #team-b-logo {
+            height: 100px;
+            width: 70px;
+            background-color: transparent;
+            margin-right: 60px;
+        }
+    
+        .team-name {
+            font-size: 18px;
+            font-weight: bold;
+        }
+    
+        .score-time {
+            text-align: center;
+            position: static;
+        }
+    
+        .score {
+            font-size: 48px;
+            font-weight: bold;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    
+        .score span {
+            margin: 0 10px;
+        }
+    
+        .score-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 10px;
+        }
+    
+        .score-controls button {
+            font-size: 20px;
+            margin: 0 10px;
+            padding: 5px 15px;
+            background: #002b75;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    
+        .score-controls button:hover {
+            background: #0044cc;
+        }
+    
+        .timer {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+    
+        .goal-log {
+            font-size: 16px;
+            margin-top: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+    
+        .goal-log div {
+            width: 45%;
+        }
+    
+        .goal-log ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+    
+        .var-display img {
+            width: 60px;
+            height: 60px;
+            margin: auto;
+            display: block;
+        }
+    
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            align-items: center;
+        }
+    
+        .control-group {
+            display: flex;
+            gap: 10px;
+        }
+    
+        .control-group button {
+            padding: 10px;
+            background: #001c58;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    
+        .control-group button:hover {
+            background: #003882;
+        }
+    
+        .event-panel {
+            margin-top: 30px;
+            width: 90%;
+            max-width: 800px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+    
+        .team-selection {
+            display: flex;
+            justify-content: space-between;
+        }
+    
+        .team-selection .team-list {
+            width: 45%;
+        }
+    
+        .team-selection button {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            background: #001c58;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 5px;
+        }
+    
+        .team-selection button:hover {
+            background: #003882;
+        }
+    
+        .event-panel form {
+            margin-top: 20px;
+        }
+    
+        .event-panel label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+    
+        .event-panel select,
+        .event-panel input {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+    
+        .event-panel button[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            background: #001c58;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+    
+        .event-panel button[type="submit"]:hover {
+            background: #003882;
+        }
+    
+        .reset-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: #ff4b5c;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    
+        .reset-button:hover {
+            background-color: #ff2a3d;
+        }
+    
+        #resume-button {
+            font-size: 20px;
+            padding: 5px 15px;
+            background: #006400;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            display: none;
+        }
+    
+        #resume-button:hover {
+            background: #004d00;
+        }
+    </style>
+</head>
+<body>
+    <button class="reset-button" onclick="resetPage()">Reset</button>
+    <div class="scoreboard">
+        <div class="teams-row">
+            <div class="team">
+                <div class="team-name" id="team-a-name">-</div>
+                <img id="team-a-logo" src="" alt="Gospodarz">  
+
+            </div>
+
+            <div class="score-time">
+                <div class="score">
+                    <span id="team-a-score">0</span>
+                    <span>-</span>
+                    <span id="team-b-score">0</span>
+                </div>
+                <div class="timer" id="match-timer">00:00</div>
+                <div id="match-status"></div>
+            </div>
+
+            <div class="team">
+                <img id="team-b-logo" src="" alt="Gość">
+                <div class="team-name" id="team-b-name">-</div>
+                
+            </div>
+        </div>
+
+        <div class="goal-log">
+            <div>
+                <ul id="team-a-goals"></ul>
+            </div>
+            <div>
+                <ul id="team-b-goals"></ul>
+            </div>
+        </div>
+
+        <div class="var-display" id="var-display"></div>
+    </div>
+
+    <div class="controls">
+        <div class="control-group">
+            <button onclick="startTimer()">Start</button>
+            <button onclick="pauseTimer()">Pauza</button>
+            <button onclick="resetTimer()">Reset</button>
+            <button onclick="toggleVAR()">VAR</button>
+            <button id="resume-button" onclick="resumeSecondHalf()" style="display: none;">Wznów</button>
+        </div>
+    </div>
+
+    <div class="event-panel">
+        <h3>Gole</h3>
+        <form id="goal-form">
+            <label for="goal-scorer-home">Strzelec gospodarzy:</label>
+            <select id="goal-scorer-home">
+                <option value="">Wybierz gracza</option>
+            </select>
+
+            <label for="goal-scorer-away">Strzelec gości:</label>
+            <select id="goal-scorer-away">
+                <option value="">Wybierz gracza</option>
+            </select>
+
+            <button type="submit">Gol</button>
+        </form>
+
+        <h3>Wybierz zespoły</h3>
+        <div class="team-selection">
+            <div class="team-list">
+                <h4>Gospodarze</h4>
+                <button onclick="selectTeam('a', 'Arsenal', 'herby/arsenal.png', ['David Raya', 'William Saliba', 'Gabriel Magalhães', 'Riccardo Calafiori', 'Jurrien Timber', 'Martin Ødegaard', 'Declan Rice', 'Gabriel Martinelli', 'Bukayo Saka', 'Kai Havertz', 'Gabriel Jesus'])">Arsenal</button>
+                <button onclick="selectTeam('a', 'Aston Villa', 'herby/astonvilla.png', ['Emiliano Martínez', 'Pau Torres', 'Ezri Konsa', 'Diego Carlos', 'Matty Cash', 'Youri Tielemans', 'John McGinn', 'Morgan Rogers', 'Leon Bailey', 'Ollie Watkins', 'Jhon Durán'])">Aston Villa</button>
+                <button onclick="selectTeam('a', 'AFC Bournemouth', 'herby/bournemouth.png', ['Kepa Arrizabalaga', 'Marcos Senesi', 'Dean Huijsen', 'Milos Kerkez', 'Adam Smith', '	Ryan Christie', 'Marcus Tavernier', 'Justin Kluivert', 'Antoine Semenyo', 'Evanilson', 'Enes Ünal'])">AFC Bournemouth</button>
+                <button onclick="selectTeam('a', 'Brentford', 'herby/brentford.png', ['Mark Flekken', 'Nathan Collins', 'Ethan Pinnock', 'Ben Mee', 'Mads Roerslev', 'Vitaly Janelt', 'Mathias Jensen', 'Kevin Schade', 'Mikkel Damsgaard', 'Bryan Mbeumo', 'Yoane Wissa'])">Brentford</button>
+                <button onclick="selectTeam('a', 'Brighton & Hove Albion', 'herby/brighton.png', ['Bart Verbruggen', 'Lewis Dunk', 'Pervis Estupiñán', 'Tariq Lamptey', 'Tariq Lamptey', 'Carlos Baleba', 'Jack Hinshelwood', 'Kaoru Mitoma', 'Simon Adingra', 'João Pedro', 'Danny Welbeck'])">Brighton & Hove Albion</button>
+                <button onclick="selectTeam('a', 'Chelsea', 'herby/chelsea.png', ['Robert Sánchez', 'Levi Colwill', 'Axel Disasi', 'Marc Cucurella', 'Malo Gusto', 'Moisés Caicedo', 'Enzo Fernández', 'Cole Palmer', 'Jadon Sancho', 'Noni Madueke', 'Nicolas Jackson'])">Chelsea</button>
+                <button onclick="selectTeam('a', 'Everton', 'herby/everton.png', ['Jordan Pickford', 'Jarrad Branthwaite', 'James Tarkowski', 'Ashley Young', 'Séamus Coleman', 'Abdoulaye Doucouré', 'Idrissa Gueye', 'Dwight McNeil', 'Iliman Ndiaye', 'Dominic Calvert-Lewin', 'Beto'])">Everton</button>
+                <button onclick="selectTeam('a', 'Nottingham Forest', 'herby/forest.png', ['Matz Sels', 'Murillo', 'Nikola Milenković', 'Neco Williams', 'Ola Aina', 'Elliot Anderson', 'Morgan Gibbs-White', 'Ryan Yates', 'Callum Hudson-Odoi', 'Anthony Elanga', 'Chris Wood'])">Nottingham Forest</button>
+                <button onclick="selectTeam('a', 'Fulham', 'herby/fulham.png', ['Bernd Leno', 'Issa Diop', 'Calvin Bassey', 'Antonee Robinson', 'Kenny Tete', 'Emile Smith Rowe', 'Andreas Pereira', 'Alex Iwobi', 'Harry Wilson', 'Adama Traoré', 'Raúl Jiménez'])">Fulham</button>
+                <button onclick="selectTeam('a', 'Ipswich Town', 'herby/ipswich.png', ['Arijanet Muric', 'Jacob Greaves', 'Dara OShea', 'Leif Davis', 'Harry Clarke', 'Kalvin Phillips', 'Omari Hutchinson', 'Sammie Szmodics', 'Conor Chaplin', 'Liam Delap', 'Ali Al-Hamadi'])">Ipswich Town</button>
+                <button onclick="selectTeam('a', 'Leicester City', 'herby/leicester.png', ['Mads Hermansen', 'Wout Faes', 'Conor Coady', 'Jannik Vestergaard', 'James Justin', 'Bilal El Khannouss', 'Facundo Buonanotte', 'Wilfred Ndidi', 'Stephy Mavididi', 'Jordan Ayew', 'Jamie Vardy'])">Leicester City</button>
+                <button onclick="selectTeam('a', 'Liverpool', 'herby/liverpool.png', ['Alisson', 'Ibrahima Konaté', 'Virgil van Dijk', 'Andrew Robertson', 'Trent Alexander-Arnold', 'Ryan Gravenberch', 'Alexis Mac Allister', 'Dominik Szoboszlai', 'Luis Díaz', 'Cody Gakpo', 'Mohamed Salah'])">Liverpool</button>
+                <button onclick="selectTeam('a', 'Manchester City', 'herby/mancity.png', ['Ederson', 'Rúben Dias', 'Josko Gvardiol', 'Manuel Akanji', 'Kyle Walker', 'Rodri', 'Bernardo Silva', 'Kevin De Bruyne', 'Phil Foden', 'Savinho', 'Erling Haaland'])">Manchester City</button>
+                <button onclick="selectTeam('a', 'Manchester United', 'herby/manutd.png', ['André Onana', 'Lisandro Martínez', 'Matthijs de Ligt', 'Diogo Dalot', 'Noussair Mazraoui', 'Kobbie Mainoo', 'Bruno Fernandes', 'Marcus Rashford', 'Alejandro Garnacho', 'Amad Diallo', 'Rasmus Højlund'])">Manchester United</button>
+                <button onclick="selectTeam('a', 'Newcastle United', 'herby/newcastle.png', ['Nick Pope', 'Fabian Schär', 'Dan Burn', 'Lewis Hall', 'Kieran Trippier', 'Bruno Guimarães', 'Joelinton', 'Sandro Tonali', 'Anthony Gordon', 'Jacob Murphy', 'Alexander Isak'])">Newcastle United</button>
+                <button onclick="selectTeam('a', 'Crystal Palace', 'herby/palace.png', ['Dean Henderson', 'Marc Guéhi', 'Maxence Lacroix', 'Tyrick Mitchell', 'Daniel Muñoz', 'Will Hughes', 'Eberechi Eze', 'Cheick Doucouré', 'Ismaïla Sarr', 'Eddie Nketiah', 'Jean-Philippe Mateta'])">Crystal Palace</button>
+                <button onclick="selectTeam('a', 'Southampton', 'herby/southampton.png', ['Aaron Ramsdale', 'Taylor Harwood-Bellis', 'Jan Bednarek', 'Jack Stephens', 'Kyle Walker-Peters', 'Lesley Ugochukwu', 'Mateus Fernandes', 'Joe Aribo', 'Tyler Dibling', 'Adam Armstrong', 'Cameron Archer'])">Southampton</button>
+                <button onclick="selectTeam('a', 'Tottenham Hotspur', 'herby/tottenham.png', ['Guglielmo Vicario', 'Cristian Romero', 'Micky van de Ven', 'Destiny Udogie', 'Pedro Porro', 'Yves Bissouma', 'James Maddison', 'Dejan Kulusevski', 'Heung-min Son', 'Brennan Johnson', 'Dominic Solanke'])">Tottenham Hotspur</button>
+                <button onclick="selectTeam('a', 'West Ham United', 'herby/westham.png', ['Łukasz Fabianski', 'Konstantinos Mavropanos', 'Emerson', 'Aaron Wan-Bissaka', 'Vladimír Coufal', 'Tomas Soucek', 'Lucas Paquetá', 'Crysencio Summerville', 'Mohammed Kudus', 'Jarrod Bowen', 'Niclas Füllkrug'])">West Ham United</button>
+                <button onclick="selectTeam('a', 'Wolverhampton', 'herby/wolves.png', ['José Sá', 'Toti', 'Rayan Aït-Nouri', 'Nélson Semedo', 'Matt Doherty', 'Mario Lemina', 'João Gomes', 'Gonçalo Guedes', 'Matheus Cunha', 'Jørgen Strand Larsen', 'Hee-chan Hwang'])">Wolverhampton</button>
+            </div>
+
+            <div class="team-list">
+                <h4>Goście</h4>
+                <button onclick="selectTeam('b', 'Arsenal', 'herby/arsenal.png', ['David Raya', 'William Saliba', 'Gabriel Magalhães', 'Riccardo Calafiori', 'Jurrien Timber', 'Martin Ødegaard', 'Declan Rice', 'Gabriel Martinelli', 'Bukayo Saka', 'Kai Havertz', 'Gabriel Jesus'])">Arsenal</button>
+                <button onclick="selectTeam('b', 'Aston Villa', 'herby/astonvilla.png', ['Emiliano Martínez', 'Pau Torres', 'Ezri Konsa', 'Diego Carlos', 'Matty Cash', 'Youri Tielemans', 'John McGinn', 'Morgan Rogers', 'Leon Bailey', 'Ollie Watkins', 'Jhon Durán'])">Aston Villa</button>
+                <button onclick="selectTeam('b', 'AFC Bournemouth', 'herby/bournemouth.png', ['Kepa Arrizabalaga', 'Marcos Senesi', 'Dean Huijsen', 'Milos Kerkez', 'Adam Smith', '	Ryan Christie', 'Marcus Tavernier', 'Justin Kluivert', 'Antoine Semenyo', 'Evanilson', 'Enes Ünal'])">AFC Bournemouth</button>
+                <button onclick="selectTeam('b', 'Brentford', 'herby/brentford.png', ['Mark Flekken', 'Nathan Collins', 'Ethan Pinnock', 'Ben Mee', 'Mads Roerslev', 'Vitaly Janelt', 'Mathias Jensen', 'Kevin Schade', 'Mikkel Damsgaard', 'Bryan Mbeumo', 'Yoane Wissa'])">Brentford</button>
+                <button onclick="selectTeam('b', 'Brighton & Hove Albion', 'herby/brighton.png', ['Bart Verbruggen', 'Lewis Dunk', 'Pervis Estupiñán', 'Tariq Lamptey', 'Tariq Lamptey', 'Carlos Baleba', 'Jack Hinshelwood', 'Kaoru Mitoma', 'Simon Adingra', 'João Pedro', 'Danny Welbeck'])">Brighton & Hove Albion</button>
+                <button onclick="selectTeam('b', 'Chelsea', 'herby/chelsea.png', ['Robert Sánchez', 'Levi Colwill', 'Axel Disasi', 'Marc Cucurella', 'Malo Gusto', 'Moisés Caicedo', 'Enzo Fernández', 'Cole Palmer', 'Jadon Sancho', 'Noni Madueke', 'Nicolas Jackson'])">Chelsea</button>
+                <button onclick="selectTeam('b', 'Everton', 'herby/everton.png', ['Jordan Pickford', 'Jarrad Branthwaite', 'James Tarkowski', 'Ashley Young', 'Séamus Coleman', 'Abdoulaye Doucouré', 'Idrissa Gueye', 'Dwight McNeil', 'Iliman Ndiaye', 'Dominic Calvert-Lewin', 'Beto'])">Everton</button>
+                <button onclick="selectTeam('b', 'Nottingham Forest', 'herby/forest.png', ['Matz Sels', 'Murillo', 'Nikola Milenković', 'Neco Williams', 'Ola Aina', 'Elliot Anderson', 'Morgan Gibbs-White', 'Ryan Yates', 'Callum Hudson-Odoi', 'Anthony Elanga', 'Chris Wood'])">Nottingham Forest</button>
+                <button onclick="selectTeam('b', 'Fulham', 'herby/fulham.png', ['Bernd Leno', 'Issa Diop', 'Calvin Bassey', 'Antonee Robinson', 'Kenny Tete', 'Emile Smith Rowe', 'Andreas Pereira', 'Alex Iwobi', 'Harry Wilson', 'Adama Traoré', 'Raúl Jiménez'])">Fulham</button>
+                <button onclick="selectTeam('b', 'Ipswich Town', 'herby/ipswich.png', ['Arijanet Muric', 'Jacob Greaves', 'Dara OShea', 'Leif Davis', 'Harry Clarke', 'Kalvin Phillips', 'Omari Hutchinson', 'Sammie Szmodics', 'Conor Chaplin', 'Liam Delap', 'Ali Al-Hamadi'])">Ipswich Town</button>
+                <button onclick="selectTeam('b', 'Leicester City', 'herby/leicester.png', ['Mads Hermansen', 'Wout Faes', 'Conor Coady', 'Jannik Vestergaard', 'James Justin', 'Bilal El Khannouss', 'Facundo Buonanotte', 'Wilfred Ndidi', 'Stephy Mavididi', 'Jordan Ayew', 'Jamie Vardy'])">Leicester City</button>
+                <button onclick="selectTeam('b', 'Liverpool', 'herby/liverpool.png', ['Alisson', 'Ibrahima Konaté', 'Virgil van Dijk', 'Andrew Robertson', 'Trent Alexander-Arnold', 'Ryan Gravenberch', 'Alexis Mac Allister', 'Dominik Szoboszlai', 'Luis Díaz', 'Cody Gakpo', 'Mohamed Salah'])">Liverpool</button>
+                <button onclick="selectTeam('b', 'Manchester City', 'herby/mancity.png', ['Ederson', 'Rúben Dias', 'Josko Gvardiol', 'Manuel Akanji', 'Kyle Walker', 'Rodri', 'Bernardo Silva', 'Kevin De Bruyne', 'Phil Foden', 'Savinho', 'Erling Haaland'])">Manchester City</button>
+                <button onclick="selectTeam('b', 'Manchester United', 'herby/manutd.png', ['André Onana', 'Lisandro Martínez', 'Matthijs de Ligt', 'Diogo Dalot', 'Noussair Mazraoui', 'Kobbie Mainoo', 'Bruno Fernandes', 'Marcus Rashford', 'Alejandro Garnacho', 'Amad Diallo', 'Rasmus Højlund'])">Manchester United</button>
+                <button onclick="selectTeam('b', 'Newcastle United', 'herby/newcastle.png', ['Nick Pope', 'Fabian Schär', 'Dan Burn', 'Lewis Hall', 'Kieran Trippier', 'Bruno Guimarães', 'Joelinton', 'Sandro Tonali', 'Anthony Gordon', 'Jacob Murphy', 'Alexander Isak'])">Newcastle United</button>
+                <button onclick="selectTeam('b', 'Crystal Palace', 'herby/palace.png', ['Dean Henderson', 'Marc Guéhi', 'Maxence Lacroix', 'Tyrick Mitchell', 'Daniel Muñoz', 'Will Hughes', 'Eberechi Eze', 'Cheick Doucouré', 'Ismaïla Sarr', 'Eddie Nketiah', 'Jean-Philippe Mateta'])">Crystal Palace</button>
+                <button onclick="selectTeam('b', 'Southampton', 'herby/southampton.png', ['Aaron Ramsdale', 'Taylor Harwood-Bellis', 'Jan Bednarek', 'Jack Stephens', 'Kyle Walker-Peters', 'Lesley Ugochukwu', 'Mateus Fernandes', 'Joe Aribo', 'Tyler Dibling', 'Adam Armstrong', 'Cameron Archer'])">Southampton</button>
+                <button onclick="selectTeam('b', 'Tottenham Hotspur', 'herby/tottenham.png', ['Guglielmo Vicario', 'Cristian Romero', 'Micky van de Ven', 'Destiny Udogie', 'Pedro Porro', 'Yves Bissouma', 'James Maddison', 'Dejan Kulusevski', 'Heung-min Son', 'Brennan Johnson', 'Dominic Solanke'])">Tottenham Hotspur</button>
+                <button onclick="selectTeam('b', 'West Ham United', 'herby/westham.png', ['Łukasz Fabianski', 'Konstantinos Mavropanos', 'Emerson', 'Aaron Wan-Bissaka', 'Vladimír Coufal', 'Tomas Soucek', 'Lucas Paquetá', 'Crysencio Summerville', 'Mohammed Kudus', 'Jarrod Bowen', 'Niclas Füllkrug'])">West Ham United</button>
+                <button onclick="selectTeam('b', 'Wolverhampton', 'herby/wolves.png', ['José Sá', 'Toti', 'Rayan Aït-Nouri', 'Nélson Semedo', 'Matt Doherty', 'Mario Lemina', 'João Gomes', 'Gonçalo Guedes', 'Matheus Cunha', 'Jørgen Strand Larsen', 'Hee-chan Hwang'])">Wolverhampton</button>
+            </div>
+        </div>
+
+        <h3>Ustawienia meczu</h3>
+        <label for="match-duration">Długość trwania meczu (w minutach):</label>
+        <input type="number" id="match-duration" placeholder="Wprowadź długość trwania meczu" step="0.1">
+        <button id="save-settings" onclick="saveMatchSettings()">Zapisz</button>
+    </div>
+
+    <script>
+        let timerInterval;
+        let currentTime = 0;
+        let matchDuration = 0;
+        let totalMatchTime = 0;
+        let isSecondHalf = false;
+        let matchSettingsSaved = false;
+        const timerDisplay = document.getElementById('match-timer');
+        const matchStatusDisplay = document.getElementById('match-status');
+        const resumeButton = document.getElementById('resume-button');
+        const saveButton = document.getElementById('save-settings');
+        const whistleSound = new Audio('gwizdek.mp3'); // Plik dźwiękowy
+
+        function resetPage() {
+            location.reload();
+        }
+
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = Math.floor(seconds % 60);
+            return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
+        }
+
+        function saveMatchSettings() {
+            const matchDurationInput = document.getElementById('match-duration');
+            const matchDurationValue = parseFloat(matchDurationInput.value);
+            if (isNaN(matchDurationValue) || matchDurationValue <= 0) {
+                alert('Wprowadź wartość!');
+                return;
+            }
+            matchDuration = matchDurationValue * 60; // Convert to seconds
+            totalMatchTime = matchDuration;
+            matchSettingsSaved = true;
+            alert('Ustawienia meczowe zapisane pomyślnie!');
+        }
+
+        function startTimer() {
+            if (!matchSettingsSaved) {
+                alert('Najpierw zapisz ustawienia meczowe!');
+                return;
+            }
+
+            if (isSecondHalf && currentTime >= totalMatchTime / 2) {
+                currentTime = totalMatchTime / 2; // Restart from second half start
+            }
+
+            timerInterval = setInterval(function () {
+                currentTime++;
+                timerDisplay.textContent = formatTime(currentTime);
+
+                // Check for the end of the first half
+                if (currentTime >= totalMatchTime / 2 && !isSecondHalf) {
+                    matchStatusDisplay.textContent = 'HALF TIME';
+                    whistleSound.play(); // Odtwórz gwizdek
+                    clearInterval(timerInterval); // Stop the timer during half time
+                    resumeButton.style.display = 'inline-block'; // Show resume button
+                }
+
+                // Check for the end of the second half
+                if (isSecondHalf && currentTime >= totalMatchTime) {
+                    matchStatusDisplay.textContent = 'FULL TIME';
+                    whistleSound.play(); // Odtwórz gwizdek
+                    clearInterval(timerInterval); // Stop the timer after full time
+                }
+            }, 1000);
+        }
+
+        function pauseTimer() {
+            clearInterval(timerInterval);
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            currentTime = 0;
+            timerDisplay.textContent = '00:00';
+            matchStatusDisplay.textContent = '';
+            resumeButton.style.display = 'none'; // Hide resume button
+        }
+
+        function resumeSecondHalf() {
+            isSecondHalf = true;
+            resumeButton.style.display = 'none'; // Hide resume button
+            matchStatusDisplay.textContent = '';
+            startTimer(); // Start the second half
+        }
+
+        function selectTeam(team, name, logo, players) {
+            const teamName = team === 'a' ? 'team-a' : 'team-b';
+            const teamScorer = team === 'a' ? 'goal-scorer-home' : 'goal-scorer-away';
+            document.getElementById(`${teamName}-name`).textContent = name;
+            document.getElementById(`${teamName}-logo`).src = logo;
+            populatePlayerSelect(players, teamScorer);
+        }
+
+        function populatePlayerSelect(players, selectId) {
+            const select = document.getElementById(selectId);
+            select.innerHTML = ''; // Clear previous options
+            const defaultOption = document.createElement('option');
+            defaultOption.value = '';
+            defaultOption.textContent = 'Wybierz gracza';
+            select.appendChild(defaultOption);
+            players.forEach(player => {
+                const option = document.createElement('option');
+                option.value = player;
+                option.textContent = player;
+                select.appendChild(option);
+            });
+        }
+
+        function logGoal(event) {
+            event.preventDefault();
+            const homeScorer = document.getElementById('goal-scorer-home').value;
+            const awayScorer = document.getElementById('goal-scorer-away').value;
+
+            const homeScore = document.getElementById('team-a-score');
+            const awayScore = document.getElementById('team-b-score');
+
+            const homeGoals = document.getElementById('team-a-goals');
+            const awayGoals = document.getElementById('team-b-goals');
+
+            if (homeScorer) {
+                const li = document.createElement('li');
+                li.textContent = `${homeScorer} (${formatTime(currentTime)})`;
+                homeScore.textContent = parseInt(homeScore.textContent) + 1;
+                const removeButton = document.createElement('button');
+                removeButton.textContent = '-';
+                removeButton.onclick = function () {
+                    li.remove();
+                    homeScore.textContent = parseInt(homeScore.textContent) - 1;
+                };
+                li.appendChild(removeButton);
+                homeGoals.appendChild(li);
+            }
+
+            if (awayScorer) {
+                const li = document.createElement('li');
+                li.textContent = `${awayScorer} (${formatTime(currentTime)})`;
+                awayScore.textContent = parseInt(awayScore.textContent) + 1;
+                const removeButton = document.createElement('button');
+                removeButton.textContent = '-';
+                removeButton.onclick = function () {
+                    li.remove();
+                    awayScore.textContent = parseInt(awayScore.textContent) - 1;
+                };
+                li.appendChild(removeButton);
+                awayGoals.appendChild(li);
+            }
+        }
+
+        document.getElementById('goal-form').addEventListener('submit', logGoal);
+
+        function toggleVAR() {
+            const varElement = document.getElementById('var-display');
+            if (varElement.innerHTML) {
+                varElement.innerHTML = ''; // Clear VAR display
+            } else {
+                varElement.innerHTML = '<img src="var.png" alt="VAR">'; // Display VAR logo
+            }
+        }
+    </script>
+</body>
+</html>
