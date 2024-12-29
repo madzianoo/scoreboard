@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tablica wyników</title>
+    <link rel="icon" type="image/png" href="herby/premierleague.png">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -268,6 +269,9 @@
                     <span id="team-b-score">0</span>
                 </div>
                 <div class="timer" id="match-timer">00:00</div>
+                <div id="pause-icon" style="display: none;">
+                    <img src="pauza.png" alt="Pause" style="width: 50px; height: 50px;">
+                </div>
                 <div id="match-status"></div>
             </div>
 
@@ -409,41 +413,6 @@
             alert('Ustawienia meczowe zapisane pomyślnie!');
         }
 
-        function startTimer() {
-            if (!matchSettingsSaved) {
-                alert('Najpierw zapisz ustawienia meczowe!');
-                return;
-            }
-
-            if (isSecondHalf && currentTime >= totalMatchTime / 2) {
-                currentTime = totalMatchTime / 2; // Restart from second half start
-            }
-
-            timerInterval = setInterval(function () {
-                currentTime++;
-                timerDisplay.textContent = formatTime(currentTime);
-
-                // Check for the end of the first half
-                if (currentTime >= totalMatchTime / 2 && !isSecondHalf) {
-                    matchStatusDisplay.textContent = 'HALF TIME';
-                    whistleSound.play(); // Odtwórz gwizdek
-                    clearInterval(timerInterval); // Stop the timer during half time
-                    resumeButton.style.display = 'inline-block'; // Show resume button
-                }
-
-                // Check for the end of the second half
-                if (isSecondHalf && currentTime >= totalMatchTime) {
-                    matchStatusDisplay.textContent = 'FULL TIME';
-                    whistleSound.play(); // Odtwórz gwizdek
-                    clearInterval(timerInterval); // Stop the timer after full time
-                }
-            }, 1000);
-        }
-
-        function pauseTimer() {
-            clearInterval(timerInterval);
-        }
-
         function resetTimer() {
             clearInterval(timerInterval);
             currentTime = 0;
@@ -532,6 +501,46 @@
                 varElement.innerHTML = '<img src="var.png" alt="VAR">'; // Display VAR logo
             }
         }
+
+        function pauseTimer() {
+    clearInterval(timerInterval);
+    const pauseIcon = document.getElementById('pause-icon');
+    pauseIcon.style.display = 'block'; // Pokaż ikonę pauzy
+}
+
+function startTimer() {
+    const pauseIcon = document.getElementById('pause-icon');
+    pauseIcon.style.display = 'none'; // Ukryj ikonę pauzy, jeśli była widoczna
+
+    if (!matchSettingsSaved) {
+        alert('Najpierw zapisz ustawienia meczowe!');
+        return;
+    }
+
+    if (isSecondHalf && currentTime < totalMatchTime / 2) {
+        currentTime = totalMatchTime / 2; // Zapewnia, że druga połowa zaczyna się od połowy, ale tylko raz
+    }
+
+    timerInterval = setInterval(function () {
+        currentTime++;
+        timerDisplay.textContent = formatTime(currentTime);
+
+        // Check for the end of the first half
+        if (currentTime >= totalMatchTime / 2 && !isSecondHalf) {
+            matchStatusDisplay.textContent = 'HALF TIME';
+            whistleSound.play(); // Odtwórz gwizdek
+            clearInterval(timerInterval); // Stop the timer during half time
+            resumeButton.style.display = 'inline-block'; // Show resume button
+        }
+
+        // Check for the end of the second half
+        if (isSecondHalf && currentTime >= totalMatchTime) {
+            matchStatusDisplay.textContent = 'FULL TIME';
+            whistleSound.play(); // Odtwórz gwizdek
+            clearInterval(timerInterval); // Stop the timer after full time
+        }
+    }, 1000);
+}
     </script>
 </body>
 </html>
